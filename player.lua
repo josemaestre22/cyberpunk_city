@@ -18,8 +18,10 @@ player.offset = 0
 player.current_frame = 1
 player.current_image = 1
 
--- Player positional variables
+-- Player positional variables  
+player.tile = 4 -- The tile where the player is currently at counting from the bottom up
 player.x = 0
+player.y = (map.height * map.tile_height) - (player.height * player.scale_y) - (map.tile_height * player.tile) --map height in pixels, player height in pixels, player position in pixels.
 player.speed = 200
 
 

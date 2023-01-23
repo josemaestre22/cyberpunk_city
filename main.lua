@@ -1,40 +1,38 @@
 function love.load()
-    love.window.setTitle("Cyberpunk City")
-    -- Player table (similar to a python dict or a Javascript object)
-    player = {}
-    -- Sprite dimensions
-    player.width = 50
-    player.height = 75
-    -- Sprite starting position
-    player.x = love.graphics.getWidth() / 2
-    player.y = love.graphics.getHeight() - player.height
-    -- Sprite movement variables
-    player.speed = 200
-    player.jump_starting_position = player.y
-    player.jump_height = player.jump_starting_position -200
-    player.
+    -- Set filter to nearest to prevent bluriness when scaling sprites
+    love.graphics.setDefaultFilter("nearest", "nearest")
+
+    -- Tilemap
+    require("map")
+    map:generate_quads()
+
+    --Player implementation
+    require("player")
+    player:generate_quads()
+
+    background = love.graphics.newImage("cyberpunk-street.png")
     
-
-end
-
-function love.draw()
-    -- Draw sprite
-    love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
 end
 
 function love.update(dt)
-    -- Character movement
     if love.keyboard.isDown("right") then
-        player.x = player.x + player.speed * dt -- dt used to make game or movement speed the same independent of system speed
+        player:run_animation(dt)
+        player.scale_x = 2
+        player.offset = 0
+        player.x = player.x + player.speed * dt
+
     elseif love.keyboard.isDown("left") then
+        player:run_animation(dt)
+        player.scale_x = -2
+        player.offset = player.width / 2
         player.x = player.x - player.speed * dt
-    elseif love.keyboard.isDown("up") then
-        print(player.y)
+    else
+        player:idle_animation(dt)
     end
-    -- Collition detection for the left and right window borders 
-    if player.x < 0 then
-        player.x = 0
-    elseif player.x + player.width > love.graphics.getWidth() then  -- player.x + player.width used to calculate the location of the rightmost side of the player
-        player.x = love.graphics.getWidth() - player.width
-    end
+end
+
+function love.draw()
+    love.graphics.draw(background, 0, 0, 0, (map.width * map.tile_width) / background:getWidth(), ((map.height - player.tile + 2) * map.tile_height) / background:getHeight())
+    map:draw_map()
+    love.graphics.draw(player.images[player.current_image], player.animation_frames[math.floor(player.current_frame)], player.x, player.y, 0, player.scale_x, player.scale_y, player.offset, 0)
 end
