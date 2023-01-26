@@ -1,6 +1,6 @@
 --Player sprite and its animations
 player = {}
-player.images = {love.graphics.newImage("/sprite_sheets/Biker_idle.png"), love.graphics.newImage("sprite_sheets/Biker_run.png")}
+player.images = {love.graphics.newImage("/sprite_sheets/Biker_idle.png"), love.graphics.newImage("sprite_sheets/Biker_run.png"), love.graphics.newImage("sprite_sheets/Biker_jump.png")}
 
 -- Dimensions of each indiviual character movement image in the sprite sheet
 player.width = 48
@@ -18,12 +18,14 @@ player.offset = 0
 player.current_frame = 1
 player.current_image = 1
 
--- Player positional variables  
+-- Player positional and movement variables  
 player.tile = 4 -- The tile where the player is currently at counting from the bottom up
 player.x = 0
 player.y = (map.height * map.tile_height) - (player.height * player.scale_y) - (map.tile_height * player.tile) --map height in pixels, player height in pixels, player position in pixels.
 player.speed = 200
-
+player.y_velocity = 0
+player.gravity = 15
+player.ground = player.y
 
 -- Generate quads of all of the animation frames in the sprite_sheets
 function player.generate_quads(self)
@@ -49,5 +51,14 @@ function player.run_animation(self, dt)
         self.current_frame = self.current_frame + 10 * dt
     else
         self.current_frame = 5
+    end
+end
+
+function player.jump_animation(self, dt)
+    self.current_image = 3
+    if self.current_frame >= 11 and self.current_frame <= 14 then
+        self.current_frame = self.current_frame + 7 * dt
+    else
+        self.current_frame = 11
     end
 end

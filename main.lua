@@ -18,22 +18,54 @@ function love.load()
 end
 
 function love.update(dt)
-    --Player movement
+    -- Jump implementation
+    if love.keyboard.isDown("up") then
+        -- If the player is in the ground
+        if player.y == player.ground then
+            -- Change its y velocity to initiate the jump
+            player.y_velocity = -400
+        end
+    end 
+    
+    -- If the player hasn't jumped
+    if player.y_velocity ~= 0 then 
+        player:jump_animation(dt)
+        -- Initiate Jump
+        player.y = player.y + player.y_velocity * dt
+
+        -- Apply gravity
+        player.y_velocity = player.y_velocity + player.gravity   
+    end
+    
+    -- Check if the player hit the ground again
+    if player.y >= player.ground then 
+        player.y = player.ground
+        player.y_velocity = 0
+    end
+
+    --Player horizontal movement implementation
     if love.keyboard.isDown("right") then
-        player:run_animation(dt)
+        if player.ground == player.y then
+            player:run_animation(dt)
+        end
         player.scale_x = 2
         player.offset = 0
         player.x = player.x + player.speed * dt
 
     elseif love.keyboard.isDown("left") then
-        player:run_animation(dt)
+        if player.ground == player.y then
+            player:run_animation(dt)
+        end
         player.scale_x = -2
         player.offset = player.width / 2
         player.x = player.x - player.speed * dt
 
     else
-        player:idle_animation(dt)
+        if player.ground == player.y then
+            player:idle_animation(dt)
+        end
     end
+        
 
     --Camera implementation
     -- If the x-axis position of the player is more than the middle of the screen
@@ -52,6 +84,18 @@ function love.update(dt)
             cam_x = math.floor(-player.x + love.graphics.getWidth() / 2)
         end
     end
+
+    --Collision detection
+    --Limit player to map borders
+    if player.x < 0 then 
+        player.x = 0
+    elseif player.x + player.width > (map.width * map.tile_width) then
+        player.x = (map.width * map.tile_width) - player.width
+    end
+
+    -- Make player fall
+    print("player X: " .. player.x)
+    print("player Y: " .. player.y)
 end
 
 function love.draw()
