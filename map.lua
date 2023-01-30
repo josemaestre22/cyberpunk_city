@@ -1,5 +1,6 @@
 -- Map object
 map = {}
+
 function map.load(self)
     -- Map tiles sprite sheet image and dimensions
     self.image = love.graphics.newImage("/sprite_sheets/Tiles.png")
@@ -58,6 +59,9 @@ function map.load(self)
         31, 32, 13, 14, 31, 32, 22, 12, 31, 32, 9, 13, 14, 15, 49, 50, 48, 47, 48, 53, 48, 47, 48, 47, 54, 47, 48, 53, 48, 47, 48, 51, 52, 15, 13, 14, 9, 31, 32, 13, 14, 31, 32, 22, 12, 31, 32, 9, 13, 14, 15, 49, 50, 48, 47, 48, 53, 48, 47, 48, 47, 54, 47, 48, 53, 48, 47, 48, 51, 52, 15, 13, 14, 9, 31, 32, 13, 14, 31, 32, 22, 12, 31, 32, 9, 13, 14, 15, 49, 50, 48, 47, 48, 53, 48, 47, 48, 47, 54, 47,
         37, 38, 19, 20, 37, 38, 8, 18, 37, 38, 15, 19, 20, 16, 7, 8, 10, 11, 11, 11, 11, 12, 7, 7, 10, 11, 11, 11, 11, 11, 11, 12, 8, 16, 19, 20, 15, 37, 38, 19, 20, 37, 38, 8, 18, 37, 38, 15, 19, 20, 16, 7, 8, 10, 11, 11, 11, 11, 12, 7, 7, 10, 11, 11, 11, 11, 11, 11, 12, 8, 16, 19, 20, 15, 37, 38, 19, 20, 37, 38, 8, 18, 37, 38, 15, 19, 20, 16, 7, 8, 10, 11, 11, 11, 11, 12, 7, 7, 10, 11
     }
+    
+    -- Map background image
+    self.background = love.graphics.newImage("cyberpunk-street.png")
 end
 
 -- Generate a quad (coordinates) of each tile in the sprite sheet image
@@ -72,7 +76,8 @@ function map.generate_quads(self)
 end
 
 --Draw the tile map by placing a corresponding tile where a number is not 0 (not an empty tile)
-function map.draw_map(self)
+function map.draw(self)
+    love.graphics.draw(self.background, 0, 0, 0, (self.width * self.tile_width) / self.background:getWidth(), ((self.height - 4 + 2) * self.tile_height) / self.background:getHeight())
     for i = 1, self.height do
         for j = 1, self.width do
             if self.tile_map[((i - 1) * self.width) + j] ~= 0 then

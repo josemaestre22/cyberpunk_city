@@ -1,4 +1,4 @@
---Player sprite and its animations
+--Player object
 player = {}
 
 function player.load(self)
@@ -28,6 +28,7 @@ function player.load(self)
     self.gravity = 15
     self.ground = self.y + (self.height * self.scale_y)
     self.current_tile = math.floor((self.y + self.height  * self.scale_y) / map.tile_height) * map.width + math.floor((self.x / map.tile_width + 1))
+    self.cam_x = 0 -- Camera x-axis position
     self:generate_quads()
 end
 
@@ -140,6 +141,31 @@ function player.update(self, dt)
         self.ground = math.floor(self.current_tile / map.width) * map.tile_height
         self.y = self.ground - (self.height * self.scale_y)
         self.y_velocity = 0
+    end
+
+    --Player map borders collision detection
+    if self.x < 0 then 
+        self.x = 0
+    elseif self.x + self.width > (map.width * map.tile_width) then
+        self.x = (map.width * map.tile_width) - self.width
+    end
+
+    -- Camera implementation
+    -- If the x-axis position of the player is more than the middle of the screen
+    if self.x > love.graphics.getWidth() / 2 then
+        --Move the camera
+    
+        --Prevent the camera from going off the right border by checking
+        --If the x-axis position of the player is more than the width of the map in pixels minus the right-most half of the map visible to the player
+        if self.x > (map.width * map.tile_width) - (love.graphics.getWidth() / 2) then
+            self.cam_x = - (map.width * map.tile_width / 2)
+
+        -- Else, the camera is not at the rightmost part of the map
+        else  
+            -- Move the camera x-axis by assigning it the the negative of the current player x-axis position 
+            -- so that it moves to the side oposite to the player and add to it the half of the screen width so the player is at the center
+            self.cam_x = math.floor(-self.x + love.graphics.getWidth() / 2)
+        end
     end
 end
 
