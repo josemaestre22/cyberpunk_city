@@ -12,10 +12,7 @@ function love.load()
 
     -- Enemies implementation
     require("enemies")
-    enemies = {}
-    for i=1, 4 do
-        enemies[i] = enemy:new(i * 100)
-    end
+    enemies:load(3)
 end
 
 function love.update(dt)

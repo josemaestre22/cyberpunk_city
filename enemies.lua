@@ -1,3 +1,5 @@
+-- Enemies list
+enemies = {}
 
 -- Enemy Class
 enemy = {
@@ -19,7 +21,7 @@ function enemy:new(seed_number)
     object = {}   -- create object
     setmetatable(object, self)
     self.__index = self
-    math.randomseed(os.time() + seed_number)
+    math.randomseed(os.time() * seed_number)
     object.x = math.random(player.x + 200, (map.width * map.tile_width) - (object.width * object.scale_x))
     object.y = (map.height * map.tile_height) - (object.height * object.scale_y) - (map.tile_height * 4)
     object.current_tile = math.floor((object.y + object.height  * object.scale_y) / map.tile_height) * map.width + math.floor((object.x / map.tile_width + 1))
@@ -30,6 +32,56 @@ function enemy:new(seed_number)
     end
     object:generate_quads()
     return object
+end
+
+function enemies.load(self, x)
+    for i=1, x do
+        enemies[i] = enemy:new(i * 2 ^ i)
+    end
+end
+
+function enemy.update(self, dt)
+    if self.direction == "right" and self.x < map.width * map.tile_width then
+        self.scale_x = 2
+        self.offset = 0
+        self:walk_animation(dt)
+        self.x = self.x + self.speed * dt
+        
+    else
+        self.direction = "left"
+    end
+    
+    if self.direction == "left" and self.x > 0 then
+        self.scale_x = -2
+        self.offset = self.width / 2
+        self:walk_animation(dt)
+        self.x = self.x - self.speed * dt
+
+    else
+        self.direction = "right"
+    end
+    
+    self.current_tile = math.floor((self.y + self.height  * self.scale_y) / map.tile_height) * map.width + math.floor((self.x / map.tile_width + 1))
+
+    -- Ramp collision detection
+    if map.tile_map[self.current_tile + 1] == 0 then
+        self.y = self.y + map.tile_height
+    elseif map.tile_map[self.current_tile - map.width + 1] ~= 0 then
+        self.y = self.y - map.tile_height
+    end
+
+    if self:check_collision() then
+        player:hurt_animation(dt)
+        if player.direction == "right" then
+            player.x = player.x - player.speed * dt
+        elseif player.direction == "left" then
+            player.x = player.x + player.speed * dt
+        end
+    end
+end
+
+function enemy.draw(self)
+    love.graphics.draw(self.images[self.current_image], self.animation_frames[math.floor(self.current_frame)], self.x, self.y, 0, self.scale_x, self.scale_y, self.offset, 0)
 end
 
 -- Generate quads of all of the animation frames in the sprite_sheets
@@ -59,46 +111,30 @@ function enemy.walk_animation(self, dt)
     end
 end
 
-function enemy.update(self, dt)
-    if self.direction == "right" and self.x < map.width * map.tile_width then
-        self.scale_x = 2
-        self.offset = 0
-        self:walk_animation(dt)
-        self.x = self.x + self.speed * dt
-        
-        -- Ramps Collision detection (COULD IMPROVE BY CHECKING FOR X-AXIS COLLISION)
-        if map.tile_map[self.current_tile] == 43 or map.tile_map[self.current_tile] == 44 then
-            self.y = self.y + map.tile_height
-        end
-        if map.tile_map[self.current_tile - map.width] == 45 or map.tile_map[self.current_tile - map.width] == 46 then
-            self.y = self.y - map.tile_height
-        end
-        
-    else
-        self.direction = "left"
-    end
-    
-    if self.direction == "left" and self.x > 0 then
-        self.scale_x = -2
-        self.offset = self.width / 2
-        self:walk_animation(dt)
-        self.x = self.x - self.speed * dt
-        
-        -- Ramps Collision detection (COULD IMPROVE BY CHECKING FOR X-AXIS)
-        if map.tile_map[self.current_tile - map.width] == 43 or map.tile_map[self.current_tile - map.width] == 4 then
-            self.y = self.y - map.tile_height
-        end
-        if map.tile_map[self.current_tile] == 45 or map.tile_map[self.current_tile] == 46 then
-            self.y = self.y + map.tile_height
-        end
-        
-    else
-        self.direction = "right"
-    end
-    
-    self.current_tile = math.floor((self.y + self.height  * self.scale_y) / map.tile_height) * map.width + math.floor((self.x / map.tile_width + 1))
-end
+-- Check enemy collision with player
+function enemy.check_collision(self)
+    local player_left = player.x
+    local player_right = player.x + player.width
+    local player_top = player.y
+    local player_bottom = player.y + player.height
 
-function enemy.draw(self)
-    love.graphics.draw(self.images[self.current_image], self.animation_frames[math.floor(self.current_frame)], self.x, self.y, 0, self.scale_x, self.scale_y, self.offset, 0)
+    local enemy_left = self.x
+    local enemy_right = self.x + self.width
+    local enemy_top = self.y
+    local enemy_bottom = self.y + self.height
+
+    --If Red's right side is further to the right than Blue's left side.
+    if  player_right > enemy_left
+    --and Red's left side is further to the left than Blue's right side.
+    and player_left < enemy_right
+    --and Red's bottom side is further to the bottom than Blue's top side.
+    and player_bottom > enemy_top
+    --and Red's top side is further to the top than Blue's bottom side then..
+    and player_top < enemy_bottom then
+        --There is collision!
+        return true
+    else
+        --If one of these statements is false, return false.
+        return false
+    end
 end
