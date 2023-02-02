@@ -36,7 +36,7 @@ end
 
 function enemies.load(self, x)
     for i=1, x do
-        enemies[i] = enemy:new(i * 2 ^ i)
+        enemies[i] = enemy:new(i)
     end
 end
 
@@ -71,12 +71,7 @@ function enemy.update(self, dt)
     end
 
     if self:check_collision() then
-        player:hurt_animation(dt)
-        if player.direction == "right" then
-            player.x = player.x - player.speed * dt
-        elseif player.direction == "left" then
-            player.x = player.x + player.speed * dt
-        end
+        self:resolve_collision(dt)
     end
 end
 
@@ -123,18 +118,33 @@ function enemy.check_collision(self)
     local enemy_top = self.y
     local enemy_bottom = self.y + self.height
 
-    --If Red's right side is further to the right than Blue's left side.
+    --If player's right side is further to the right than the enemy's left side.
     if  player_right > enemy_left
-    --and Red's left side is further to the left than Blue's right side.
+    --and player's left side is further to the left than the enemy's right side.
     and player_left < enemy_right
-    --and Red's bottom side is further to the bottom than Blue's top side.
+    --and player's bottom side is further to the bottom than the enemy's top side.
     and player_bottom > enemy_top
-    --and Red's top side is further to the top than Blue's bottom side then..
+    --and player's top side is further to the top than the enemy's bottom side then..
     and player_top < enemy_bottom then
         --There is collision!
         return true
     else
         --If one of these statements is false, return false.
         return false
+    end
+end
+
+function enemy.resolve_collision(self, dt)
+    local push_distance = 0
+    
+    -- Player right side collision with enemy left side
+    if player.last_x <  self.x then
+        push_distance = (player.x + player.width) - self.x
+        player.x = player.x - push_distance
+
+    -- Player left side collision with right left side
+    elseif player.last_x > self.x then
+        push_distance = player.x - (self.x  + self.width)
+        player.x = player.x - push_distance
     end
 end

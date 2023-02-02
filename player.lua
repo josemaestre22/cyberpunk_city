@@ -6,7 +6,8 @@ function player.load(self)
         love.graphics.newImage("/sprite_sheets/player/Biker_idle.png"), 
         love.graphics.newImage("sprite_sheets/player/Biker_run.png"), 
         love.graphics.newImage("sprite_sheets/player/Biker_jump.png"),
-        love.graphics.newImage("sprite_sheets/player/Biker_hurt.png")
+        love.graphics.newImage("sprite_sheets/player/Biker_hurt.png"),
+        love.graphics.newImage("sprite_sheets/player/Biker_death.png")
     }
     
     -- Dimensions of each indiviual character movement image in the sprite sheet
@@ -34,56 +35,67 @@ function player.load(self)
     self.ground = self.y + (self.height * self.scale_y)
     self.current_tile = math.floor((self.y + self.height  * self.scale_y) / map.tile_height) * map.width + math.floor((self.x / map.tile_width + 1))
     self.cam_x = 0 -- Camera x-axis position
-    self.direction = "right"
+    -- Player previous positions used in collition detection
+    self.last_x = self.x
+    self.last_y = self.y
+    -- Player lives counter
+    self.lives = 3
+    self.lives_image = love.graphics.newImage("heart-icon.png")
     self:generate_quads()
 end
 
 function player.update(self, dt)
-    -- Jump implementation
-    if love.keyboard.isDown("up") then
-        -- If the player is in the ground
-        if self.y +  (self.height * self.scale_y) == self.ground then
-            -- Change its y velocity to initiate the jump
-            self.y_velocity = -400
-        end
-    end 
+    -- Register the player last position before moving 
+    self.last_x = self.x
+    self.last_y = self.y   
     
-    -- If the player hasn't initiated the jump
-    if self.y_velocity ~= 0 then 
-        self:jump_animation(dt)
-        
-        -- Initiate Jump
-        self.y = self.y + self.y_velocity * dt
-        
-        -- Apply gravity
-        self.y_velocity = self.y_velocity + self.gravity  
-    end
-    
-    --Player horizontal movement implementation
-    if love.keyboard.isDown("right") then
-        if self.y +  (self.height * self.scale_y) == self.ground then
-            self:run_animation(dt)
+    if self.lives > 0 then
+        -- Jump implementation 
+        if love.keyboard.isDown("up") then
+            -- If the player is in the ground
+            if self.y +  (self.height * self.scale_y) == self.ground then
+                -- Change its y velocity to initiate the jump
+                self.y_velocity = -400
+            end
+        end
+
+        -- If the player has initiated the jump
+        if self.y_velocity ~= 0 then 
+            self:jump_animation(dt)
+            
+            -- Initiate Jump
+            self.y = self.y + self.y_velocity * dt
+            
+            -- Apply gravity
+            self.y_velocity = self.y_velocity + self.gravity  
         end
         
-        self.scale_x = 2
-        self.offset = 0
-        self.x = self.x + self.speed * dt
-        self.direction = "right"
-        
-    elseif love.keyboard.isDown("left") then
-        if self.y +  (self.height * self.scale_y) == self.ground then
-            self:run_animation(dt)
+        --Player horizontal movement implementation
+        if love.keyboard.isDown("right") then
+            if self.y +  (self.height * self.scale_y) == self.ground then
+                self:run_animation(dt)
+            end
+            
+            self.scale_x = 2
+            self.offset = 0
+            self.x = self.x + self.speed * dt
+            
+        elseif love.keyboard.isDown("left") then
+            if self.y +  (self.height * self.scale_y) == self.ground then
+                self:run_animation(dt)
+            end
+            
+            self.scale_x = -2
+            self.offset = self.width / 2
+            self.x = self.x - self.speed * dt
+            
+        else
+            if self.y +  (self.height * self.scale_y) == self.ground then
+                self:idle_animation(dt)
+            end
         end
-        
-        self.scale_x = -2
-        self.offset = self.width / 2
-        self.x = self.x - self.speed * dt
-        self.direction = "left"
-        
     else
-        if self.y +  (self.height * self.scale_y) == self.ground then
-            player:idle_animation(dt)
-        end
+        self:death_animation(dt)
     end
     
     self:check_collision()
@@ -139,6 +151,19 @@ function player.hurt_animation(self, dt)
     end
 end
 
+function player.death_animation(self, dt)
+    self.current_image = 5
+    if self.current_frame >= 17 and self.current_frame < 22 then
+        self.current_frame = self.current_frame + 5 * dt
+        
+    elseif math.floor(self.current_frame) == 22 then
+        self.current_frame = 22
+        
+    else
+        self.current_frame = 17
+    end
+end
+
 -- Player collision detection with map
 function player.check_collision(self)
     -- Update current tile position
@@ -161,7 +186,7 @@ function player.check_collision(self)
         self.ground = self.y + (self.height * self.scale_y)
     end
     
-    --Player map borders collision detection
+    --Player map borders collision detection (Need to fix in cases the player is moving)
     if self.x < 0 then 
         self.x = 0
     elseif self.x + self.width > (map.width * map.tile_width) then
