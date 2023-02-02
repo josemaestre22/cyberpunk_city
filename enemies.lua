@@ -13,7 +13,10 @@ enemy = {
     animation_frames = {},
     current_image = 1,
     current_frame = 1,
-    direction = "left"
+    direction = "left",
+    collided = false,
+    collition_duration = 0,
+    proyectiles = {}
 }
 
 -- Enemy Constructor
@@ -71,7 +74,11 @@ function enemy.update(self, dt)
     end
 
     if self:check_collision() then
+        self.collition_duration = self.collition_duration + dt
         self:resolve_collision(dt)
+
+    elseif self.collition_duration < 0.1 then
+        self.collided = false
     end
 end
 
@@ -135,6 +142,7 @@ function enemy.check_collision(self)
 end
 
 function enemy.resolve_collision(self, dt)
+    -- How much the enemy needs to push the player so they aren't touching anymore
     local push_distance = 0
     
     -- Player right side collision with enemy left side
@@ -146,5 +154,10 @@ function enemy.resolve_collision(self, dt)
     elseif player.last_x > self.x then
         push_distance = player.x - (self.x  + self.width)
         player.x = player.x - push_distance
+    end
+    
+    if self.collided == false then
+        player.lives = player.lives - 1
+        self.collided = true
     end
 end
