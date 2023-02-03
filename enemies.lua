@@ -9,14 +9,13 @@ enemy = {
     scale_x = 2,
     scale_y = 2,
     offset = 0,
-    speed = 200,
+    speed = 150,
     animation_frames = {},
     current_image = 1,
     current_frame = 1,
     direction = "left",
     collided = false,
-    collition_duration = 0,
-    proyectiles = {}
+    bullets = {},
 }
 
 -- Enemy Constructor
@@ -33,8 +32,35 @@ function enemy:new(seed_number)
         object.current_tile = object.current_tile + (map.width * 2)
         object.y = (math.floor(object.current_tile / map.width) * map.tile_height) - (object.height * object.scale_y)
     end
+    object.walk_distances = {object.x - 400, object.x + 400}
     object:generate_quads()
     return object
+end
+
+-- Bullet class
+bullet = {
+    image = love.graphics.newImage("Ball2.png"),
+    speed = 700
+}
+
+-- Bullet Constructor
+function bullet:new(entity)
+    object = {}   -- create object
+    setmetatable(object, self)
+    self.__index = self
+    width = self.image:getWidth()
+    height = self.image:getHeight()
+    object.x = entity.x
+    object.y = entity.y 
+    return object
+end
+
+function bullet.shoot(self, dt, direction)
+    if direction == "left" then
+        self.x = self.x - self.speed * dt
+    else
+        self.x = self.x + self.speed * dt
+    end
 end
 
 function enemies.load(self, x)
@@ -44,24 +70,28 @@ function enemies.load(self, x)
 end
 
 function enemy.update(self, dt)
-    if self.direction == "right" and self.x < map.width * map.tile_width then
-        self.scale_x = 2
-        self.offset = 0
-        self:walk_animation(dt)
-        self.x = self.x + self.speed * dt
-        
-    else
-        self.direction = "left"
-    end
-    
-    if self.direction == "left" and self.x > 0 then
+    if self.direction == "left" and self.x > self.walk_distances[1] then
         self.scale_x = -2
         self.offset = self.width / 2
         self:walk_animation(dt)
         self.x = self.x - self.speed * dt
-
     else
+        table.insert(self.bullets, bullet:new(self))
         self.direction = "right"
+    end
+
+    if self.direction == "right" and self.x < self.walk_distances[2] then
+        self.scale_x = 2
+        self.offset = 0
+        self:walk_animation(dt)
+        self.x = self.x + self.speed * dt
+    else
+        table.insert(self.bullets, bullet:new(self))
+        self.direction = "left"
+    end
+
+    for i=1, #self.bullets do
+        self.bullets[i]:shoot(dt, direction)
     end
     
     self.current_tile = math.floor((self.y + self.height  * self.scale_y) / map.tile_height) * map.width + math.floor((self.x / map.tile_width + 1))
@@ -74,16 +104,17 @@ function enemy.update(self, dt)
     end
 
     if self:check_collision() then
-        self.collition_duration = self.collition_duration + dt
         self:resolve_collision(dt)
-
-    elseif self.collition_duration < 0.1 then
+    else
         self.collided = false
     end
 end
 
 function enemy.draw(self)
     love.graphics.draw(self.images[self.current_image], self.animation_frames[math.floor(self.current_frame)], self.x, self.y, 0, self.scale_x, self.scale_y, self.offset, 0)
+    for i=1, #self.bullets do
+        love.graphics.draw(self.bullets[i].image, self.bullets[i].x, self.bullets[i].y)
+    end
 end
 
 -- Generate quads of all of the animation frames in the sprite_sheets
