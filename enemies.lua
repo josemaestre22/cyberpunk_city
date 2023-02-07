@@ -15,7 +15,8 @@ enemy = {
     current_frame = 1,
     directions = {"left", "right"},
     collided = false,
-    bullets = {}
+    bullets = {},
+    target_distance = 400
 }
 
 -- Enemy Constructor
@@ -142,9 +143,12 @@ function enemy.update(self, dt)
         self.offset = self.width / 2
         self:walk_animation(dt)
         self.x = self.x - self.speed * dt
+
+        if player.x + self.target_distance >= self.x then
+            print("player on sight")
+        end
+
     else 
-        table.insert(self.bullets, bullet:new(self))
-        self.bullets[#self.bullets].shot = true
         self.direction = "right"
     end
     
@@ -154,7 +158,6 @@ function enemy.update(self, dt)
         self:walk_animation(dt)
         self.x = self.x + self.speed * dt
     else
-        table.insert(self.bullets, bullet:new(self))
         self.direction = "left"
     end
     
