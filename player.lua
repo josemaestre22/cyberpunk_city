@@ -87,8 +87,11 @@ function player.update(self, dt)
             
             self.scale_x = -2
             self.offset = self.width / 2
-            self.x = self.x - self.speed * dt
-            
+
+            if self.x > 0 then
+                self.x = self.x - self.speed * dt
+            end
+
         else
             if self.y +  (self.height * self.scale_y) == self.ground then
                 self:idle_animation(dt)
@@ -187,7 +190,7 @@ function player.check_collision(self)
     end
     
     --Player map borders collision detection (Need to fix in cases the player is moving)
-    if self.x < 0 then 
+    if self.x <= 0 then 
         self.x = 0
     elseif self.x + self.width > (map.width * map.tile_width) then
         self.x = (map.width * map.tile_width) - self.width

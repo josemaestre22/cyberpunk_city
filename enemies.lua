@@ -13,18 +13,18 @@ enemy = {
     animation_frames = {},
     current_image = 1,
     current_frame = 1,
-    direction = "left",
+    directions = {"left", "right"},
     collided = false,
-    bullets = {},
+    bullets = {}
 }
 
 -- Enemy Constructor
-function enemy:new(seed_number)
+function enemy:new(enemy_number, enemies_amount)
     object = {}   -- create object
     setmetatable(object, self)
     self.__index = self
-    math.randomseed(os.time() * seed_number)
-    object.x = math.random(player.x + 200, (map.width * map.tile_width) - (object.width * object.scale_x))
+    local distance_between_enemies = (map.width * map.tile_width) / enemies_amount
+    object.x = distance_between_enemies * enemy_number
     object.y = (map.height * map.tile_height) - (object.height * object.scale_y) - (map.tile_height * 4)
     object.current_tile = math.floor((object.y + object.height  * object.scale_y) / map.tile_height) * map.width + math.floor((object.x / map.tile_width + 1))
     --If the enemy spawned on top of an empty tile lower it two tile rows
@@ -32,89 +32,12 @@ function enemy:new(seed_number)
         object.current_tile = object.current_tile + (map.width * 2)
         object.y = (math.floor(object.current_tile / map.width) * map.tile_height) - (object.height * object.scale_y)
     end
-    object.walk_distances = {object.x - 400, object.x + 400}
+    object.walk_distances = {object.x - distance_between_enemies + self.width, object.x + distance_between_enemies - self.width}
+    object.last_x = object.x
+    math.randomseed(os.time() / enemy_number)
+    object.direction = self.directions[math.floor(math.random(2))]
     object:generate_quads()
     return object
-end
-
--- Bullet class
-bullet = {
-    image = love.graphics.newImage("Ball2.png"),
-    speed = 700
-}
-
--- Bullet Constructor
-function bullet:new(entity)
-    object = {}   -- create object
-    setmetatable(object, self)
-    self.__index = self
-    width = self.image:getWidth()
-    height = self.image:getHeight()
-    object.x = entity.x
-    object.y = entity.y 
-    return object
-end
-
-function bullet.shoot(self, dt, direction)
-    if direction == "left" then
-        self.x = self.x - self.speed * dt
-    else
-        self.x = self.x + self.speed * dt
-    end
-end
-
-function enemies.load(self, x)
-    for i=1, x do
-        enemies[i] = enemy:new(i)
-    end
-end
-
-function enemy.update(self, dt)
-    if self.direction == "left" and self.x > self.walk_distances[1] then
-        self.scale_x = -2
-        self.offset = self.width / 2
-        self:walk_animation(dt)
-        self.x = self.x - self.speed * dt
-    else
-        table.insert(self.bullets, bullet:new(self))
-        self.direction = "right"
-    end
-
-    if self.direction == "right" and self.x < self.walk_distances[2] then
-        self.scale_x = 2
-        self.offset = 0
-        self:walk_animation(dt)
-        self.x = self.x + self.speed * dt
-    else
-        table.insert(self.bullets, bullet:new(self))
-        self.direction = "left"
-    end
-
-    for i=1, #self.bullets do
-        self.bullets[i]:shoot(dt, direction)
-    end
-    
-    self.current_tile = math.floor((self.y + self.height  * self.scale_y) / map.tile_height) * map.width + math.floor((self.x / map.tile_width + 1))
-
-    -- Ramp collision detection
-    if map.tile_map[self.current_tile + 1] == 0 then
-        self.y = self.y + map.tile_height
-    elseif map.tile_map[self.current_tile - map.width + 1] ~= 0 then
-        self.y = self.y - map.tile_height
-    end
-
-    if self:check_collision() then
-        self:resolve_collision(dt)
-    else
-        self.collided = false
-    end
-end
-
-function enemy.draw(self)
-    love.graphics.draw(self.images[self.current_image], self.animation_frames[math.floor(self.current_frame)], self.x, self.y, 0, self.scale_x, self.scale_y, self.offset, 0)
-    for i=1, #self.bullets do
-        love.graphics.draw(self.bullets[i].image, self.bullets[i].x, self.bullets[i].y)
-    end
 end
 
 -- Generate quads of all of the animation frames in the sprite_sheets
@@ -145,25 +68,25 @@ function enemy.walk_animation(self, dt)
 end
 
 -- Check enemy collision with player
-function enemy.check_collision(self)
-    local player_left = player.x
-    local player_right = player.x + player.width
-    local player_top = player.y
-    local player_bottom = player.y + player.height
-
+function enemy.check_collision(self, entity)
+    local entity_left = entity.x
+    local entity_right = entity.x + entity.width
+    local entity_top = entity.y
+    local entity_bottom = entity.y + entity.height
+    
     local enemy_left = self.x
     local enemy_right = self.x + self.width
     local enemy_top = self.y
     local enemy_bottom = self.y + self.height
-
-    --If player's right side is further to the right than the enemy's left side.
-    if  player_right > enemy_left
-    --and player's left side is further to the left than the enemy's right side.
-    and player_left < enemy_right
-    --and player's bottom side is further to the bottom than the enemy's top side.
-    and player_bottom > enemy_top
-    --and player's top side is further to the top than the enemy's bottom side then..
-    and player_top < enemy_bottom then
+    
+    --If entity's right side is further to the right than the enemy's left side.
+    if  entity_right > enemy_left
+    --and entity's left side is further to the left than the enemy's right side.
+    and entity_left < enemy_right
+    --and entity's bottom side is further to the bottom than the enemy's top side.
+    and entity_bottom > enemy_top
+    --and entity's top side is further to the top than the enemy's bottom side then..
+    and entity_top < enemy_bottom then
         --There is collision!
         return true
     else
@@ -172,23 +95,91 @@ function enemy.check_collision(self)
     end
 end
 
-function enemy.resolve_collision(self, dt)
+function enemy.resolve_collision(self, entity, dt)
     -- How much the enemy needs to push the player so they aren't touching anymore
     local push_distance = 0
     
     -- Player right side collision with enemy left side
-    if player.last_x <  self.x then
-        push_distance = (player.x + player.width) - self.x
-        player.x = player.x - push_distance
-
-    -- Player left side collision with right left side
-    elseif player.last_x > self.x then
-        push_distance = player.x - (self.x  + self.width)
-        player.x = player.x - push_distance
+    if entity.last_x <  self.x then
+        push_distance = (entity.x + entity.width) - self.x
+        entity.x = entity.x - push_distance
+        
+        if entity.x  < 1 then 
+            self.direction = "right"
+        end
+        
+        -- Player left side collision with right left side
+    elseif entity.last_x > self.x then
+        push_distance = entity.x - (self.x  + self.width)
+        entity.x = entity.x - push_distance
     end
     
-    if self.collided == false then
-        player.lives = player.lives - 1
-        self.collided = true
+    if entity == player then
+        if self.collided == false then
+            entity.lives = entity.lives - 1
+            self.collided = true
+        end
+    else
+        if self.direction == "left" then
+            self.direction = "right"
+        else
+            self.direction = "left"
+        end
     end
+end
+
+function enemies.load(self, enemies_amount)
+    for i=1, enemies_amount do
+        enemies[i] = enemy:new(i, enemies_amount)
+    end
+end
+
+function enemy.update(self, dt)
+    self.last_x = self.x
+
+    if self.direction == "left" and self.x > self.walk_distances[1] and  self.x > 0 then
+        self.scale_x = -2
+        self.offset = self.width / 2
+        self:walk_animation(dt)
+        self.x = self.x - self.speed * dt
+    else 
+        table.insert(self.bullets, bullet:new(self))
+        self.bullets[#self.bullets].shot = true
+        self.direction = "right"
+    end
+    
+    if self.direction == "right" and self.x < self.walk_distances[2] and self.x < map.width * map.tile_width then
+        self.scale_x = 2
+        self.offset = 0
+        self:walk_animation(dt)
+        self.x = self.x + self.speed * dt
+    else
+        table.insert(self.bullets, bullet:new(self))
+        self.direction = "left"
+    end
+    
+    self.current_tile = math.floor((self.y + self.height  * self.scale_y) / map.tile_height) * map.width + math.floor((self.x / map.tile_width + 1))
+    
+    -- Ramp collision detection
+    if map.tile_map[self.current_tile + 1] == 0 then
+        self.y = self.y + map.tile_height
+    elseif map.tile_map[self.current_tile - map.width + 1] ~= 0 then
+        self.y = self.y - map.tile_height
+    end
+    
+    if self:check_collision(player) then
+        self:resolve_collision(player, dt)
+    else
+        self.collided = false
+    end
+    
+    for i, enemy in ipairs(enemies) do
+        if self:check_collision(enemy) and enemy.x ~= self.x then
+            self:resolve_collision(enemy, dt)
+        end
+    end
+end
+
+function enemy.draw(self)
+    love.graphics.draw(self.images[self.current_image], self.animation_frames[math.floor(self.current_frame)], self.x, self.y, 0, self.scale_x, self.scale_y, self.offset, 0)
 end

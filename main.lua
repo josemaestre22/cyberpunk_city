@@ -13,13 +13,18 @@ function love.load()
     -- Enemies implementation
     require("enemies")
     enemies:load(3)
+
+    require("bullet")
 end
 
 function love.update(dt)
     player:update(dt)
-    for i=1, #enemies do
-        enemies[i]:update(dt)
-    end
+    for i, enemy in ipairs(enemies) do
+        enemy:update(dt)
+        for j, bullet in ipairs(enemy.bullets) do
+            bullet:update(dt, enemy, j)
+        end
+    end 
 end
 
 function love.draw()
@@ -27,10 +32,14 @@ function love.draw()
     love.graphics.translate(player.cam_x, 0) --Move the camera
     map:draw()
     player:draw()
-    for i=1, #enemies do
-        enemies[i]:draw()
+    for i, enemy in ipairs(enemies) do
+        enemy:draw()
+        for j, bullet in ipairs(enemy.bullets) do
+            bullet:draw()
+        end
     end
     love.graphics.pop() -- Used to be able to correctly dipsplay lives HUD without it being translated by the camera
+
     for i=0, player.lives - 1 do
         love.graphics.draw(player.lives_image, (i * player.lives_image:getWidth() * 2.25 ), 0, 0, 4 , 4)
     end
