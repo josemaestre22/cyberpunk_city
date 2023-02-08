@@ -1,7 +1,9 @@
+bullets = {}
+
 -- Bullet class
 bullet = {
     image = love.graphics.newImage("Ball2.png"),
-    speed = 700
+    speed = 400,
 }
 
 -- Bullet Constructor
@@ -12,19 +14,20 @@ function bullet:new(entity)
     width = self.image:getWidth()
     height = self.image:getHeight()
     object.x = entity.x
-    object.y = entity.y 
+    object.y = entity.y + entity.height 
+    object.direction = entity.direction
     return object
 end
 
-function bullet.update(self, dt, enemy, bullet_number)
+function bullet.update(self, dt, bullet_number)
     if self.x > 0 and self.x < map.width * map.tile_width then
-        if enemy.direction == "left" then
+        if self.direction == "left" then
             self.x = self.x - self.speed * dt
-        elseif enemy.direction == "right" then
+        else
             self.x = self.x + self.speed * dt
         end
     else 
-        table.remove(enemy.bullets, bullet_number)
+        table.remove(bullets, bullet_number)
     end
 end
 

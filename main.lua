@@ -19,12 +19,14 @@ end
 
 function love.update(dt)
     player:update(dt)
+
     for i, enemy in ipairs(enemies) do
         enemy:update(dt)
-        for j, bullet in ipairs(enemy.bullets) do
-            bullet:update(dt, enemy, j)
-        end
     end 
+
+    for i, bullet in ipairs(bullets) do
+        bullet:update(dt, i)
+    end
 end
 
 function love.draw()
@@ -34,10 +36,12 @@ function love.draw()
     player:draw()
     for i, enemy in ipairs(enemies) do
         enemy:draw()
-        for j, bullet in ipairs(enemy.bullets) do
-            bullet:draw()
-        end
     end
+
+    for i, bullet in ipairs(bullets) do
+        bullet:draw()
+    end
+
     love.graphics.pop() -- Used to be able to correctly dipsplay lives HUD without it being translated by the camera
 
     for i=0, player.lives - 1 do
