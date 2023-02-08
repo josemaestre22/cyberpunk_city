@@ -32,5 +32,5 @@ function bullet.update(self, dt, bullet_number)
 end
 
 function bullet.draw(self)
-    love.graphics.draw(self.image, self.x, self.y)
+    love.graphics.draw(self.image, self.x, self.y, 0, 2, 2)
 end
