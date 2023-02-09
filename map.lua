@@ -3,7 +3,7 @@ map = {}
 
 function map.load(self)
     -- Map tiles sprite sheet image and dimensions
-    self.image = love.graphics.newImage("/sprite_sheets/Tiles.png")
+    self.image = love.graphics.newImage("assets/sprite_sheets/Tiles.png")
     self.image_width = self.image:getWidth()
     self.image_height = self.image:getHeight()
     self.tile_width = 16
@@ -61,7 +61,7 @@ function map.load(self)
     }
     
     -- Map background image
-    self.background = love.graphics.newImage("cyberpunk-street.png")
+    self.background = love.graphics.newImage("assets/cyberpunk-street.png")
 end
 
 -- Generate a quad (coordinates) of each tile in the sprite sheet image

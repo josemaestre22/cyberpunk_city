@@ -12,7 +12,7 @@ function love.load()
 
     -- Enemies implementation
     require("enemies")
-    enemies:load(3)
+    enemies:load(4)
 
     require("bullet")
 end

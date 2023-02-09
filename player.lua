@@ -3,11 +3,11 @@ player = {}
 
 function player.load(self)
     self.images = {
-        love.graphics.newImage("/sprite_sheets/player/Biker_idle.png"), 
-        love.graphics.newImage("sprite_sheets/player/Biker_run.png"), 
-        love.graphics.newImage("sprite_sheets/player/Biker_jump.png"),
-        love.graphics.newImage("sprite_sheets/player/Biker_hurt.png"),
-        love.graphics.newImage("sprite_sheets/player/Biker_death.png")
+        love.graphics.newImage("assets/sprite_sheets/player/Biker_idle.png"), 
+        love.graphics.newImage("assets/sprite_sheets/player/Biker_run.png"), 
+        love.graphics.newImage("assets/sprite_sheets/player/Biker_jump.png"),
+        love.graphics.newImage("assets/sprite_sheets/player/Biker_hurt.png"),
+        love.graphics.newImage("assets/sprite_sheets/player/Biker_death.png")
     }
     
     -- Dimensions of each indiviual character movement image in the sprite sheet
@@ -40,7 +40,7 @@ function player.load(self)
     self.last_y = self.y
     -- Player lives counter
     self.lives = 3
-    self.lives_image = love.graphics.newImage("heart-icon.png")
+    self.lives_image = love.graphics.newImage("assets/heart-icon.png")
     self:generate_quads()
 end
 

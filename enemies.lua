@@ -3,7 +3,7 @@ enemies = {}
 
 -- Enemy Class
 enemy = {
-    images = {love.graphics.newImage("sprite_sheets/enemy_1/Idle.png"), love.graphics.newImage("sprite_sheets/enemy_1/Walk.png"), love.graphics.newImage("sprite_sheets/enemy_1/Attack.png")},
+    images = {love.graphics.newImage("assets/sprite_sheets/enemy_1/Idle.png"), love.graphics.newImage("assets/sprite_sheets/enemy_1/Walk.png"), love.graphics.newImage("assets/sprite_sheets/enemy_1/Attack.png")},
     width = 48,
     height = 48,
     scale_x = 2,
@@ -15,9 +15,8 @@ enemy = {
     current_frame = 1,
     directions = {"left", "right"},
     collided = false,
-    target_distance = 400,
-    fire_rate = 2,
-    last_shot_time = 0
+    target_distance = 224,
+    time = 0
 }
 
 -- Enemy Constructor
@@ -72,7 +71,7 @@ end
 function enemy.attack_animation(self, dt)
     self.current_image = 3
     if self.current_frame >= 11 and self.current_frame <= 13 then
-        self.current_frame = self.current_frame + 5 * dt
+        self.current_frame = self.current_frame + 1.5 * dt
     else
         self.current_frame = 11
     end
@@ -87,7 +86,7 @@ function enemy.check_collision(self, entity)
     
     local enemy_left = self.x
     local enemy_right = self.x + self.width
-    local enemy_top = self.y
+    local enemy_top = self.y 
     local enemy_bottom = self.y + self.height
     
     --If entity's right side is further to the right than the enemy's left side.
@@ -147,23 +146,23 @@ end
 
 function enemy.update(self, dt)
     self.last_x = self.x
+    self.time = self.time + dt
 
     if self.direction == "left" and self.x > self.walk_distances[1] and  self.x > 0 then
         self.scale_x = -2
         self.offset = self.width / 2
-
-        if player.x + self.target_distance >= self.x and self.last_shot_time <= self.fire_rate  then
-            table.insert(bullets, bullet:new(self))
+        
+        if player.x >= self.x - self.target_distance and player.x <= self.x and player.y == self.y then
             self:attack_animation(dt)
-            print(self.last_shot_time)
-            self.last_shot_time = self.last_shot_time + dt
-            
+            if self.time >= 1 then
+                table.insert(bullets, bullet:new(self))
+                self.time = 0
+            end
         else
             self:walk_animation(dt)
             self.x = self.x - self.speed * dt   
-            self.last_shot_time = 0 
         end
-
+        
     else 
         self.direction = "right"
     end
@@ -171,9 +170,18 @@ function enemy.update(self, dt)
     if self.direction == "right" and self.x < self.walk_distances[2] and self.x < map.width * map.tile_width then
         self.scale_x = 2
         self.offset = 0
-        self:walk_animation(dt)
-        self.x = self.x + self.speed * dt
 
+        if player.x <= self.x + self.target_distance and player.x >= self.x and player.y == self.y then
+            self:attack_animation(dt)
+            if self.time >= 1 then
+                table.insert(bullets, bullet:new(self))
+                self.time = 0
+            end
+        else
+            self:walk_animation(dt)
+            self.x = self.x + self.speed * dt   
+        end
+        
     else
         self.direction = "left"
     end
