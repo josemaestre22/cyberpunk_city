@@ -10,6 +10,7 @@ local anim8 = require"libraries/anim8"
 function love.load()
     map = sti("tiled_map/Sidescroller city map extended.lua")
     world = bump.newWorld()
+    
 end
 
 function love.update(dt)
