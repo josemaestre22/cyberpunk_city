@@ -5,5 +5,5 @@
 	path = libraries/anim8
 	url = https://github.com/kikito/anim8.git
 [submodule "libraries/bump.lua"]
-	path = libraries/bump.lua
+	path = libraries/bump
 	url = https://github.com/kikito/bump.lua
