@@ -355,6 +355,6 @@
 </data>
  </layer>
  <objectgroup id="25" name="Spawn Points" locked="1">
-  <object id="45" name="Player" x="87.3334" y="493.999" width="48" height="48" visible="0"/>
+  <object id="45" name="Player" x="80" y="480" width="32" height="64" visible="0"/>
  </objectgroup>
 </map>

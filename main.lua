@@ -26,5 +26,4 @@ function love.draw()
 	-- Draw world
 	map:draw()
 	player:draw()
-	love.graphics.rectangle("line", player.x , player.y, player.width, player.height)
 end
