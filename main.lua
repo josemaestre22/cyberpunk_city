@@ -11,8 +11,12 @@ require"player"
 
 function love.load()
 	love.graphics.setDefaultFilter( "nearest" )
-	-- Load map file
-	map = sti("tiled_map/Sidescroller city map extended.lua")
+	-- Load map file and collidable world
+	map = sti("tiled_map/Sidescroller city map extended.lua", {"bump"})
+	world = bump.newWorld()
+	map:bump_init(world)
+
+	-- Load player
 	player:load()
 end
 
@@ -25,6 +29,6 @@ end
 function love.draw()
 	-- Draw world
 	map:draw()
+	map:bump_draw()
 	player:draw()
-	love.graphics.rectangle("line", player.x , player.y, player.width, player.height)
 end
