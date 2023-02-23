@@ -645,7 +645,11 @@ return {
           name = "Player",
           class = "",
           shape = "rectangle",
+<<<<<<< HEAD
           x = 96,
+=======
+          x = 80,
+>>>>>>> e634038fdef682e6892fb842763f665609dee43d
           y = 480,
           width = 32,
           height = 64,

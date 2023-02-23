@@ -5,6 +5,14 @@ function player:load()
     self.height = map.layers["Spawn Points"].objects[1].height
     self.x = map.layers["Spawn Points"].objects[1].x
     self.y = map.layers["Spawn Points"].objects[1].y
+
+    self.frame_width = 48
+    self.frame_height = 48
+    self.top_blank_space = 14
+    self.right_blank_space = 24
+
+    self.scale_y = self.height / (self.frame_height - self.top_blank_space)
+    self.scale_x = self.width / (self.frame_width - self.right_blank_space)
     
     self.frame_width = 48
     self.frame_height = 48
@@ -25,6 +33,7 @@ function player:load()
     }
 
     self.animations = {}
+    
     for i, image in ipairs(self.images) do 
         self.animations[i] = anim8.newAnimation((anim8.newGrid(self.frame_width, self.frame_height - self.top_blank_space, image:getWidth(), image:getHeight(), 0, self.top_blank_space)("1-" .. self.images[i]:getWidth() / self.frame_width, 1)), 0.12)
     end
