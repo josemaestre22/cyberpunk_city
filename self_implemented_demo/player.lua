@@ -53,7 +53,7 @@ function player.update(self, dt)
         -- Jump implementation 
         if love.keyboard.isDown("up") then
             -- If the player is in the ground
-            if self.y +  (self.height * self.scale_y) == self.ground then
+            if self.y + (self.height * self.scale_y) == self.ground then
                 -- Change its y velocity to initiate the jump
                 self.y_velocity = -400
             end
