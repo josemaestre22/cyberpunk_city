@@ -5,7 +5,7 @@ function player:load()
     self.height = map.layers["Spawn Points"].objects[1].height
     self.x = map.layers["Spawn Points"].objects[1].x
     self.y = map.layers["Spawn Points"].objects[1].y 
-
+    
     self.frame_width = 48
     self.frame_height = 48
     self.top_blank_space = 14
@@ -31,14 +31,16 @@ function player:load()
     
     self.current_animation = 1
     
-    self.gravity = 500
+    self.onGround = true
+    self.gravity = 15
     self.vx = 0
-    self.vy = 0
-
+    self.vy = self.gravity
+    
     world:add(self, self.x, self.y, self.width, self.height)
 end
 
 function player:update(dt)
+    
     if love.keyboard.isDown("right") then
         self.current_animation = 2
         self.scale_x = self.width / (self.frame_width - self.right_blank_space)
@@ -50,12 +52,19 @@ function player:update(dt)
         self.scale_x = - (self.width / (self.frame_width - self.right_blank_space))
         self.offset = self.right_blank_space
         self.vx = -150
-
-    else
+        
+    elseif self.onGround then
         self.current_animation = 1
         self.vx = 0
+        
     end
-    print(self.onGround)
+    
+    if love.keyboard.isDown("up") and self.onGround then
+        self.vy = -500
+    elseif self.onGround == false then
+        self.current_animation = 3
+    end
+    
     self:move(dt)
     self.animations[self.current_animation]:update(dt)
 end
@@ -70,6 +79,21 @@ function player:move(dt)
     self.x, self.y = actualX, actualY
     -- deal with the collisions
     for i=1, len do
-        
+        -- Ground, ceilling and mid-air colission resolutions for jumping
+        if cols[i].normal.y == -1 then
+            self.onGround = true
+        elseif cols[i].normal.y == 1 then
+            self.vy = 0
+        --Mid-air collision with lateral box case
+        elseif i == 1 then
+            self.onGround = false
+            self.vy = self.vy + self.gravity 
+        end
+    end
+    
+    -- Mid air no collision case 
+    if len == 0 then 
+        self.onGround = false
+        self.vy = self.vy + self.gravity 
     end
 end
