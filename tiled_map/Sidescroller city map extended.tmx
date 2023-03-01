@@ -364,7 +364,8 @@
   <object id="47" x="0" y="0" width="1" height="608"/>
   <object id="48" x="1600" y="1" width="1" height="608"/>
  </objectgroup>
- <objectgroup id="25" name="Spawn Points" visible="0" locked="1">
+ <objectgroup draworder="index" id="25" name="Spawn Points" visible="0" locked="1">
+  <object id="45" name="Player" x="96" y="480" width="32" height="64"/>
   <object id="49" x="130" y="271.333" width="32" height="64"/>
   <object id="50" x="111.333" y="127.333" width="32" height="64"/>
   <object id="52" x="470.667" y="46.6667" width="32" height="64"/>
@@ -378,6 +379,5 @@
   <object id="60" x="1560.67" y="-0.666667" width="32" height="64"/>
   <object id="61" x="1386.67" y="368.667" width="32" height="64"/>
   <object id="62" x="1483.33" y="190.667" width="32" height="64"/>
-  <object id="45" name="Player" x="96" y="480" width="32" height="64"/>
  </objectgroup>
 </map>

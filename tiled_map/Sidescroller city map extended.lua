@@ -672,7 +672,7 @@ return {
     },
     {
       type = "objectgroup",
-      draworder = "topdown",
+      draworder = "index",
       id = 25,
       name = "Spawn Points",
       class = "",
@@ -684,6 +684,19 @@ return {
       parallaxy = 1,
       properties = {},
       objects = {
+        {
+          id = 45,
+          name = "Player",
+          class = "",
+          shape = "rectangle",
+          x = 96,
+          y = 480,
+          width = 32,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
         {
           id = 49,
           name = "",
@@ -847,19 +860,6 @@ return {
           shape = "rectangle",
           x = 1483.33,
           y = 190.667,
-          width = 32,
-          height = 64,
-          rotation = 0,
-          visible = true,
-          properties = {}
-        },
-        {
-          id = 45,
-          name = "Player",
-          class = "",
-          shape = "rectangle",
-          x = 96,
-          y = 480,
           width = 32,
           height = 64,
           rotation = 0,

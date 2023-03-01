@@ -7,7 +7,11 @@ anim8 = require "libraries/anim8/anim8"
 -- Bump library for physics and collision detection
 local bump = require "libraries/bump/bump"
 
+-- Camera module from the hump library for camera implementation
+local Camera = require "libraries/hump/camera"
+
 require"player"
+require"enemies"
 
 function love.load()
 	love.graphics.setDefaultFilter( "nearest" )
@@ -18,17 +22,26 @@ function love.load()
 
 	-- Load player
 	player:load()
+
+	-- Load enemies	
+	-- enemies:load()
+	camera = Camera(player.x, player.y)
 end
 
 function love.update(dt)
 	-- Update world
 	map:update(dt)
 	player:update(dt)
+	-- enemies:update(dt)
+	camera:lookAt(player.x, player.y)
 end
 
 function love.draw()
-	-- Draw world
-	map:draw()
-	map:bump_draw()
-	player:draw()
+	camera:attach()
+		-- Draw world
+		map:drawLayer(map.layers["Tiles"])
+		map:bump_draw()
+		player:draw()
+		-- enemies:draw()
+	camera:detach()
 end
