@@ -25,7 +25,7 @@ function enemy:new(enemy_number)
     object.height = map.layers["Spawn Points"].objects[2].x
     object.scale_x = object.width / self.frame_width
     object.scale_y = object.height / self.frame_height
-    for i, image in ipairs(self.images) do 
+    for i, image in ipairs(self.images) do
         self.animations[i] = anim8.newAnimation((anim8.newGrid(self.frame_width, self.frame_height, image:getWidth(), image:getHeight())("1-" .. self.images[i]:getWidth() / self.frame_width, 1)), 0.12)
     end
     return object
@@ -33,7 +33,7 @@ end
 
 function enemies:load()
     for i=2, #map.layers["Spawn Points"].objects do
-        enemies[i - 1] = enemy:new(i - 1)
+        enemies[i - 1] = enemy:new(i)
     end
 end
 
@@ -45,6 +45,6 @@ end
 
 function enemies:draw()
     for i, enemy in ipairs(enemies) do
-        enemy.animations[enemy.current_animation]:draw(enemy.images[enemy.current_animation], enemy.x, enemy.y, 0, enemy.scale_x, enemy.scale_y, enemy.offset)
+        enemy.animations[enemy.current_animation]:draw(enemy.images[enemy.current_animation], enemy.x, enemy.y, 0, 1, enemy.scale_y, enemy.offset)
     end
 end
