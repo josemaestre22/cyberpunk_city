@@ -1,10 +1,16 @@
 player = {}
 
 function player:load()
-    self.width = map.layers["Spawn Points"].objects[1].width
-    self.height = map.layers["Spawn Points"].objects[1].height
-    self.x = map.layers["Spawn Points"].objects[1].x
-    self.y = map.layers["Spawn Points"].objects[1].y 
+    for i, object in ipairs(map.layers["Spawn Points"].objects) do
+        if map.layers["Spawn Points"].objects[i].name == "Player" then
+            self.spawn_location_number = i
+        end
+    end
+    
+    self.width = map.layers["Spawn Points"].objects[self.spawn_location_number].width
+    self.height = map.layers["Spawn Points"].objects[self.spawn_location_number].height
+    self.x = map.layers["Spawn Points"].objects[self.spawn_location_number].x
+    self.y = map.layers["Spawn Points"].objects[self.spawn_location_number].y 
     
     self.frame_width = 48
     self.frame_height = 48
