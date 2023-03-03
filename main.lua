@@ -13,8 +13,11 @@ local gamera = require "libraries/gamera/gamera"
 require"player"
 require"enemies"
 
+
 function love.load()
-	love.graphics.setDefaultFilter( "nearest" )
+	-- Set scaling filter to prevent blurrines 
+	love.graphics.setDefaultFilter("nearest", "nearest")
+
 	-- Load map file and collidable world
 	map = sti("tiled_map/Sidescroller city map extended.lua", {"bump"})
 	world = bump.newWorld()
@@ -25,11 +28,13 @@ function love.load()
 	
 	-- Load enemies	
 	enemies:load()
+
+	-- Load camera
 	camera = gamera.new(0, 0, map.width * map.tilewidth, map.height * map.tileheight)
 end
 
 function love.update(dt)
-	-- Update world
+	-- Update world and entities
 	map:update(dt)
 	player:update(dt)
 	enemies:update(dt)
@@ -41,6 +46,7 @@ function love.draw()
 	camera:draw(draw_calls)
 end
 
+-- Drawing function calls of entities and map layers
 function draw_calls()
 	for i, layer in ipairs(map.layers) do
 		if layer.visible then
@@ -49,5 +55,5 @@ function draw_calls()
 	end
 	player:draw()	
 	enemies:draw()
-	-- map:bump_draw()
+	map:bump_draw()
 end
