@@ -8,7 +8,7 @@ enemy = {
     top_blank_space = 8,
     right_blank_space = 24,
     offset = 0,
-    gravity = 15,
+    gravity = 100,
 }
 
 -- Enemy Constructor
@@ -44,8 +44,8 @@ function enemies:load()
 end
 
 function enemies:update(dt)
+    enemies[1]:move(dt)
     for i, enemy in ipairs(self) do
-        enemy:move(dt)
         enemy.animations[enemy.current_animation]:update(dt)
     end
 end
@@ -57,9 +57,13 @@ function enemies:draw()
 end
 
 function enemy:move(dt)
-    local goalX, goalY = self.x + self.vx * dt, self.y + self.vy * dt
-    local actualX, actualY, cols, len = world:check(self, goalX, goalY)
-    print(len)
-    world:update(self, actualX, actualY) -- update the self's rectangle in the world
-    self.x, self.y = actualX, actualY
+    local actualX, actualY, cols, len = world:check(self, self.x + self.width, self.y + self.vy * dt)
+
+    -- If there is a collision with the ground
+    if len > 0 and cols[1].normal.y == -1 then
+        world:move(self, (self.x + self.vx * dt), (self.y + self.vy + dt)) -- update the self's rectangle in the world
+        self.x, self.y = (self.x + self.vx * dt), (self.y + self.vy * dt)
+    else 
+
+    end
   end
