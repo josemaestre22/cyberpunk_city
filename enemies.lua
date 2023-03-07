@@ -27,6 +27,8 @@ function enemy:new(enemy_number)
     object.scale_y = object.height / (self.frame_height - self.top_blank_space)
     object.animations = {}
     object.current_animation = 1
+    object.directions = {"left", "right"}
+    object.direction = object.directions[love.math.random(2)]
     
     for i, image in ipairs(object.images) do
         object.animations[i] = anim8.newAnimation((anim8.newGrid(self.frame_width, self.frame_height - self.top_blank_space, image:getWidth(), image:getHeight(), 0, self.top_blank_space)("1-" .. object.images[i]:getWidth() / self.frame_width, 1)), 0.12)
@@ -44,8 +46,8 @@ function enemies:load()
 end
 
 function enemies:update(dt)
-    enemies[1]:move(dt)
     for i, enemy in ipairs(self) do
+        enemy:move(dt)
         enemy.animations[enemy.current_animation]:update(dt)
     end
 end
@@ -57,10 +59,16 @@ function enemies:draw()
 end
 
 function enemy:move(dt)
-    local checkX, checkY, checkCols, checkLen = world:check(self, self.x + self.width + 1, self.y + self.vy * dt)
+    local goalX, goalY = self.x + self.vx * dt, self.y + self.vy * dt
+    local actualX, actualY, cols, len = world:check(self, goalX, goalY)
 
-    if checkLen > 0 then 
-        local actualX, actualY, cols, len = world:move(self, self.x + self.vx * dt, self.y + self.vy * dt)
-        self.x, self.y = actualX, actualY
+    -- If the enemy is grounded
+    if (len > 0 and cols[1].normal.y == -1) then
+        -- the enemy is not past the edge of the platform and is walking to the right
+        if self.x + self.width < cols[1].otherRect.x + cols[1].otherRect.w and self.direction == "right"
+            world:update(self, actualX, actualY) -- update the self's rectangle in the world
+            self.x, self.y = actualX, actualY
+    end
+    --Else if 
     end
 end
