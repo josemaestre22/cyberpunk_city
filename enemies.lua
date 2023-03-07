@@ -27,13 +27,13 @@ function enemy:new(enemy_number)
     object.scale_y = object.height / (self.frame_height - self.top_blank_space)
     object.animations = {}
     object.current_animation = 1
-
+    
     for i, image in ipairs(object.images) do
         object.animations[i] = anim8.newAnimation((anim8.newGrid(self.frame_width, self.frame_height - self.top_blank_space, image:getWidth(), image:getHeight(), 0, self.top_blank_space)("1-" .. object.images[i]:getWidth() / self.frame_width, 1)), 0.12)
     end
-
+    
     world:add(object, object.x, object.y, object.width, object.height)
-
+    
     return object
 end
 
@@ -57,13 +57,10 @@ function enemies:draw()
 end
 
 function enemy:move(dt)
-    local actualX, actualY, cols, len = world:check(self, self.x + self.width, self.y + self.vy * dt)
+    local checkX, checkY, checkCols, checkLen = world:check(self, self.x + self.width + 1, self.y + self.vy * dt)
 
-    -- If there is a collision with the ground
-    if len > 0 and cols[1].normal.y == -1 then
-        world:move(self, (self.x + self.vx * dt), (self.y + self.vy + dt)) -- update the self's rectangle in the world
-        self.x, self.y = (self.x + self.vx * dt), (self.y + self.vy * dt)
-    else 
-
+    if checkLen > 0 then 
+        local actualX, actualY, cols, len = world:move(self, self.x + self.vx * dt, self.y + self.vy * dt)
+        self.x, self.y = actualX, actualY
     end
-  end
+end
