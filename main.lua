@@ -12,6 +12,7 @@ local gamera = require "libraries/gamera/gamera"
 
 require"player"
 require"enemies"
+require"bullet"
 
 
 function love.load()
