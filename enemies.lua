@@ -21,14 +21,22 @@ function enemy:new(enemy_number)
     object.y = map.layers["Spawn Points"].objects[enemy_number].y
     object.width = map.layers["Spawn Points"].objects[enemy_number].width
     object.height = map.layers["Spawn Points"].objects[enemy_number].height
-    object.vx = 150
+
+    -- Randomly assign the enemy a directio  using vx
+    if love.math.random(2) == 1 then    
+        object.vx = 150
+        object.scale_x = object.width / (self.frame_width - self.right_blank_space)
+        object.offset = 0
+    else
+        object.vx = -150
+        object.scale_x = -(object.width / (self.frame_width - self.right_blank_space))
+        object.offset = self.right_blank_space
+    end
+
     object.vy = self.gravity
-    object.scale_x = object.width / (self.frame_width - self.right_blank_space)
     object.scale_y = object.height / (self.frame_height - self.top_blank_space)
     object.animations = {}
     object.current_animation = 1
-    object.directions = {"left", "right"}
-    object.direction = object.directions[love.math.random(2)]
     
     for i, image in ipairs(object.images) do
         object.animations[i] = anim8.newAnimation((anim8.newGrid(self.frame_width, self.frame_height - self.top_blank_space, image:getWidth(), image:getHeight(), 0, self.top_blank_space)("1-" .. object.images[i]:getWidth() / self.frame_width, 1)), 0.12)
@@ -59,16 +67,29 @@ function enemies:draw()
 end
 
 function enemy:move(dt)
+    -- Calculate the distance to move and check if there are any collisions with other objects in the collisions world
     local goalX, goalY = self.x + self.vx * dt, self.y + self.vy * dt
     local actualX, actualY, cols, len = world:check(self, goalX, goalY)
 
     -- If the enemy is grounded
     if (len > 0 and cols[1].normal.y == -1) then
-        -- the enemy is not past the edge of the platform and is walking to the right
-        if self.x + self.width < cols[1].otherRect.x + cols[1].otherRect.w and self.direction == "right"
-            world:update(self, actualX, actualY) -- update the self's rectangle in the world
-            self.x, self.y = actualX, actualY
-    end
-    --Else if 
+
+        -- If the projected right side of the enemy is past the right side of the platform and it's direction is right or it collided with something besides the floor
+        if actualX + self.width >= cols[1].otherRect.x + cols[1].otherRect.w or len > 1 then
+            -- Make the enemy turn left
+            self.vx = -150
+            self.scale_x = -(self.width / (self.frame_width - self.right_blank_space))
+            self.offset = self.right_blank_space
+        -- Else, if the enemy left side is past the platform left side and 
+        elseif actualX <= cols[1].otherRect.x or len > 1 then
+            -- Make the enemy turn right 
+            self.vx = 150
+            self.scale_x = self.width / (self.frame_width - self.right_blank_space)
+            self.offset = 0
+        end
+        -- Move the enemy in the collisions world and in the game
+        world:update(self, actualX, actualY) -- update the enemy's rectangle in the world
+        self.x, self.y = actualX, actualY
+
     end
 end
