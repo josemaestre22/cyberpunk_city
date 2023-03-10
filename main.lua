@@ -45,6 +45,9 @@ end
 function love.draw()
 	-- Draw everything inside the camera
 	camera:draw(draw_calls)
+	for i=0, player.lives - 1 do
+        love.graphics.draw(player.lives_image, (i * player.lives_image:getWidth() * 2.25 ), 0, 0, 4 , 4)
+    end
 end
 
 -- Drawing function calls of entities and map layers
@@ -56,5 +59,5 @@ function draw_calls()
 	end
 	player:draw()	
 	enemies:draw()
-	map:bump_draw()
+	-- map:bump_draw()
 end

@@ -22,7 +22,7 @@ function enemy:new(enemy_number)
     object.y = map.layers["Spawn Points"].objects[enemy_number].y
     object.width = map.layers["Spawn Points"].objects[enemy_number].width
     object.height = map.layers["Spawn Points"].objects[enemy_number].height
-
+    
     -- Randomly assign the enemy a direction using vx
     if love.math.random(2) == 1 then    
         object.vx = 100
@@ -33,12 +33,12 @@ function enemy:new(enemy_number)
         object.scale_x = -(object.width / (self.frame_width - self.right_blank_space))
         object.offset = self.right_blank_space
     end
-
+    
     object.vy = self.gravity
     object.scale_y = object.height / (self.frame_height - self.top_blank_space)
     object.animations = {}
     object.current_animation = 1
-
+    
     object.bullets = {}
     object.last_shot_time = 0
     
@@ -77,17 +77,17 @@ function enemy:move(dt)
     -- Calculate the distance to move and check if there are any collisions with other objects in the collisions world
     local goalX, goalY = self.x + self.vx * dt, self.y + self.vy * dt
     local actualX, actualY, cols, len = world:check(self, goalX, goalY)
-
+    
     -- If the enemy is grounded
     if (len > 0 and cols[1].normal.y == -1) then
-
+        self.current_animation = 1
         -- If the projected right side of the enemy is past the right side of the platform and it's direction is right or it collided with something besides the floor
         if actualX + self.width >= cols[1].otherRect.x + cols[1].otherRect.w or len > 1 and cols[2].normal.x == -1 then
             -- Make the enemy turn left
             self.vx = -100
             self.scale_x = -(self.width / (self.frame_width - self.right_blank_space))
             self.offset = self.right_blank_space
-        -- Else, if the enemy left side is past the platform left side and 
+            -- Else, if the enemy left side is past the platform left side and 
         elseif actualX <= cols[1].otherRect.x or len > 1 and cols[2].normal.x == 1 then
             -- Make the enemy turn right 
             self.vx = 100
@@ -97,24 +97,26 @@ function enemy:move(dt)
         -- Move the enemy in the collisions world and in the game
         world:update(self, actualX, actualY) -- update the enemy's rectangle in the world
         self.x, self.y = actualX, actualY
-        self:shoot(dt)
-        self.last_shot_time = self.last_shot_time + dt
-
-    end
-end
-
-function enemy:shoot(dt)
-    if player.x >= self.x - self.target_distance and player.x <= self.x and player.y == self.y or 
-    player.x <= self.x + self.target_distance and player.x >= self.x and player.y == self.y  then
-        self.current_animation = 2
-        if self.last_shot_time >= 1 then
-            table.insert(self.bullets, bullet:new(self))
-            self.time = 0
+        
+        -- If the player is at the target distance on the left side 
+        if player.x >= self.x - self.target_distance and player.x <= self.x and player.y == self.y and self.vx < 0 or
+        player.x <= self.x + self.target_distance and player.x >= self.x and player.y == self.y and self.vx > 0 then
+            self:shoot()
         end
 
         for i, bullet in ipairs(self.bullets) do
             bullet:move(dt, self, i)
         end
 
+        self.last_shot_time = self.last_shot_time + dt
+    end
+end
+
+function enemy:shoot()
+    self.current_animation = 2
+    
+    if self.last_shot_time >= 2 then
+        table.insert(self.bullets, bullet:new(self))
+        self.last_shot_time = 0
     end
 end

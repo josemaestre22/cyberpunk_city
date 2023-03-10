@@ -28,11 +28,17 @@ function player:load()
         love.graphics.newImage("assets/sprite_sheets/player/Biker_hurt.png"),
         love.graphics.newImage("assets/sprite_sheets/player/Biker_death.png")
     }
+
+    self.lives_image = love.graphics.newImage("assets/heart-icon.png")
     
     self.animations = {}
     
     for i, image in ipairs(self.images) do 
-        self.animations[i] = anim8.newAnimation((anim8.newGrid(self.frame_width, self.frame_height - self.top_blank_space, image:getWidth(), image:getHeight(), 0, self.top_blank_space)("1-" .. self.images[i]:getWidth() / self.frame_width, 1)), 0.12)
+        if i == 5 then
+            self.animations[i] = anim8.newAnimation((anim8.newGrid(self.frame_width, self.frame_height - self.top_blank_space, image:getWidth(), image:getHeight(), 0, self.top_blank_space)("1-" .. self.images[i]:getWidth() / self.frame_width, 1)), 0.12, 'pauseAtEnd')
+        else
+            self.animations[i] = anim8.newAnimation((anim8.newGrid(self.frame_width, self.frame_height - self.top_blank_space, image:getWidth(), image:getHeight(), 0, self.top_blank_space)("1-" .. self.images[i]:getWidth() / self.frame_width, 1)), 0.12)
+        end
     end
     
     self.current_animation = 1
@@ -41,36 +47,44 @@ function player:load()
     self.gravity = 15
     self.vx = 0
     self.vy = self.gravity
+
+    self.lives = 3
+    self.name = "Player"
     
     world:add(self, self.x, self.y, self.width, self.height)
 end
 
 function player:update(dt)
-    
-    if love.keyboard.isDown("right") then
-        self.current_animation = 2
-        self.scale_x = self.width / (self.frame_width - self.right_blank_space)
-        self.offset = 0
-        self.vx = 150
+    if self.lives > 0 then
         
-    elseif love.keyboard.isDown("left") then
-        self.current_animation = 2
-        self.scale_x = - (self.width / (self.frame_width - self.right_blank_space))
-        self.offset = self.right_blank_space
-        self.vx = -150
+        if love.keyboard.isDown("right") then
+            self.current_animation = 2
+            self.scale_x = self.width / (self.frame_width - self.right_blank_space)
+            self.offset = 0
+            self.vx = 150
+            
+        elseif love.keyboard.isDown("left") then
+            self.current_animation = 2
+            self.scale_x = - (self.width / (self.frame_width - self.right_blank_space))
+            self.offset = self.right_blank_space
+            self.vx = -150
+            
+        elseif self.onGround then
+            self.current_animation = 1
+            self.vx = 0
+            
+        end
         
-    elseif self.onGround then
-        self.current_animation = 1
+        if love.keyboard.isDown("up") and self.onGround then
+            self.vy = -500
+        elseif self.onGround == false then
+            self.current_animation = 3
+        end
+    else
+        self.current_animation = 5
         self.vx = 0
-        
     end
-    
-    if love.keyboard.isDown("up") and self.onGround then
-        self.vy = -500
-    elseif self.onGround == false then
-        self.current_animation = 3
-    end
-    
+
     self:move(dt)
     self.animations[self.current_animation]:update(dt)
 end
