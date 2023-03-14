@@ -1,16 +1,10 @@
 player = {}
 
 function player:load()
-    for i, object in ipairs(map.layers["Spawn Points"].objects) do
-        if map.layers["Spawn Points"].objects[i].name == "Player" then
-            self.spawn_location_number = i
-        end
-    end
-    
-    self.width = map.layers["Spawn Points"].objects[self.spawn_location_number].width
-    self.height = map.layers["Spawn Points"].objects[self.spawn_location_number].height
-    self.x = map.layers["Spawn Points"].objects[self.spawn_location_number].x
-    self.y = map.layers["Spawn Points"].objects[self.spawn_location_number].y 
+    self.width = map.layers["Player"].objects[1].width
+    self.height = map.layers["Player"].objects[1].height
+    self.x = map.layers["Player"].objects[1].x
+    self.y = map.layers["Player"].objects[1].y 
     
     self.frame_width = 48
     self.frame_height = 48
@@ -50,6 +44,13 @@ function player:load()
 
     self.lives = 3
     self.name = "Player"
+    self.damage_cooldown = 2
+    self.death_animation_time = 1
+    self.animation_timer = 0
+    self.dead = false
+    self.sounds = {}
+    self.sounds.hurt = love.audio.newSource("assets/Hit_hurt 200 (44).wav", "static")
+    self.sounds.jump = love.audio.newSource("assets/Jump 4.wav", "static")
     
     world:add(self, self.x, self.y, self.width, self.height)
 end
@@ -57,36 +58,48 @@ end
 function player:update(dt)
     if self.lives > 0 then
         
-        if love.keyboard.isDown("right") then
-            self.current_animation = 2
-            self.scale_x = self.width / (self.frame_width - self.right_blank_space)
-            self.offset = 0
-            self.vx = 150
-            
-        elseif love.keyboard.isDown("left") then
-            self.current_animation = 2
-            self.scale_x = - (self.width / (self.frame_width - self.right_blank_space))
-            self.offset = self.right_blank_space
-            self.vx = -150
-            
-        elseif self.onGround then
-            self.current_animation = 1
+        if self.damage_cooldown < 0.5 then
+            self.current_animation = 4
             self.vx = 0
+            self.sounds.hurt:play()
+        else
+
+            if love.keyboard.isDown("right") then
+                self.current_animation = 2
+                self.scale_x = self.width / (self.frame_width - self.right_blank_space)
+                self.offset = 0
+                self.vx = 150
+                
+            elseif love.keyboard.isDown("left") then
+                self.current_animation = 2
+                self.scale_x = - (self.width / (self.frame_width - self.right_blank_space))
+                self.offset = self.right_blank_space
+                self.vx = -150
+                
+            elseif self.onGround then
+                self.current_animation = 1
+                self.vx = 0
+            end
             
-        end
-        
-        if love.keyboard.isDown("up") and self.onGround then
-            self.vy = -500
-        elseif self.onGround == false then
-            self.current_animation = 3
+            if love.keyboard.isDown("up") and self.onGround then
+                self.sounds.jump:play()
+                self.vy = -500
+            elseif self.onGround == false then
+                self.current_animation = 3
+            end
         end
     else
         self.current_animation = 5
         self.vx = 0
+        self.animation_timer = self.animation_timer + dt
+        if self.animation_timer > self.death_animation_time then
+            self.dead = true
+        end
     end
 
     self:move(dt)
     self.animations[self.current_animation]:update(dt)
+    self.damage_cooldown = self.damage_cooldown + dt
 end
 
 function player:draw()
@@ -108,6 +121,17 @@ function player:move(dt)
         elseif i == 1 then
             self.onGround = false
             self.vy = self.vy + self.gravity 
+        end
+
+        if (cols[i].other.name == "Enemy" or cols[i].other.name == "Bullet") and self.damage_cooldown > 1 then
+            self.lives = self.lives - 1
+            self.damage_cooldown = 0
+            if cols[i].other.name == "Bullet" then
+                world:remove(cols[i].other)
+                table.remove(bullets, cols[i].other.bullet_number)
+            end
+        elseif cols[i].other.name == "Ship" then
+            won = true
         end
     end
     

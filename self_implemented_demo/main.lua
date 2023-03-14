@@ -15,14 +15,10 @@ function love.load()
     enemies:load(4)
 
     require("bullet")
-
-    require("car")
-    car:load()
 end
 
 function love.update(dt)
     player:update(dt)
-    car:update()
 
     for i, enemy in ipairs(enemies) do
         enemy:update(dt)
@@ -38,7 +34,6 @@ function love.draw()
     love.graphics.translate(player.cam_x, 0) --Move the camera
     map:draw()
     player:draw()
-    car:draw()
     for i, enemy in ipairs(enemies) do
         enemy:draw()
     end

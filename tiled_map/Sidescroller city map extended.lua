@@ -1,7 +1,7 @@
 return {
-  version = "1.9",
+  version = "1.10",
   luaversion = "5.1",
-  tiledversion = "1.9.2",
+  tiledversion = "1.10.0",
   class = "",
   orientation = "orthogonal",
   renderorder = "right-down",
@@ -9,8 +9,8 @@ return {
   height = 38,
   tilewidth = 16,
   tileheight = 16,
-  nextlayerid = 27,
-  nextobjectid = 78,
+  nextlayerid = 29,
+  nextobjectid = 80,
   properties = {},
   tilesets = {
     {
@@ -643,7 +643,7 @@ return {
         {
           id = 47,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 0,
           y = 0,
@@ -656,7 +656,7 @@ return {
         {
           id = 48,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1600,
           y = 1,
@@ -669,7 +669,7 @@ return {
         {
           id = 63,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 0,
           y = 336.333,
@@ -682,7 +682,7 @@ return {
         {
           id = 65,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 0,
           y = 544.833,
@@ -695,7 +695,7 @@ return {
         {
           id = 66,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 222.667,
           y = 576.167,
@@ -708,7 +708,7 @@ return {
         {
           id = 67,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 0,
           y = 192.5,
@@ -721,7 +721,7 @@ return {
         {
           id = 68,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 335.667,
           y = 432.5,
@@ -734,7 +734,7 @@ return {
         {
           id = 69,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 336,
           y = 256.167,
@@ -747,7 +747,7 @@ return {
         {
           id = 70,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 336.333,
           y = 111.833,
@@ -760,7 +760,7 @@ return {
         {
           id = 71,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 816,
           y = 192.167,
@@ -773,7 +773,7 @@ return {
         {
           id = 72,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 816,
           y = 336.5,
@@ -786,7 +786,7 @@ return {
         {
           id = 73,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 768,
           y = 544.167,
@@ -799,7 +799,7 @@ return {
         {
           id = 74,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1216.67,
           y = 575.5,
@@ -812,7 +812,7 @@ return {
         {
           id = 75,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1328,
           y = 431.5,
@@ -825,7 +825,7 @@ return {
         {
           id = 76,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1327.67,
           y = 256.167,
@@ -838,7 +838,7 @@ return {
         {
           id = 77,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1328.67,
           y = 96.8333,
@@ -852,9 +852,9 @@ return {
     },
     {
       type = "objectgroup",
-      draworder = "index",
-      id = 25,
-      name = "Spawn Points",
+      draworder = "topdown",
+      id = 28,
+      name = "Player",
       class = "",
       visible = false,
       opacity = 1,
@@ -865,22 +865,38 @@ return {
       properties = {},
       objects = {
         {
-          id = 45,
+          id = 79,
           name = "Player",
-          class = "",
+          type = "",
           shape = "rectangle",
-          x = 96,
-          y = 480,
+          x = 117.333,
+          y = 479.333,
           width = 32,
           height = 64,
           rotation = 0,
           visible = true,
           properties = {}
-        },
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      draworder = "index",
+      id = 25,
+      name = "Enemies",
+      class = "",
+      visible = false,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      parallaxx = 1,
+      parallaxy = 1,
+      properties = {},
+      objects = {
         {
           id = 49,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 130,
           y = 271.333,
@@ -893,7 +909,7 @@ return {
         {
           id = 50,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 111.333,
           y = 127.333,
@@ -906,7 +922,7 @@ return {
         {
           id = 52,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 470.667,
           y = 46.6667,
@@ -919,7 +935,7 @@ return {
         {
           id = 53,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 396.667,
           y = 191.333,
@@ -932,7 +948,7 @@ return {
         {
           id = 54,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 580,
           y = 367.333,
@@ -945,7 +961,7 @@ return {
         {
           id = 55,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 488,
           y = 513.333,
@@ -958,7 +974,7 @@ return {
         {
           id = 56,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1163.33,
           y = 479.333,
@@ -971,7 +987,7 @@ return {
         {
           id = 57,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 978,
           y = 271.333,
@@ -984,7 +1000,7 @@ return {
         {
           id = 58,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 822.667,
           y = 126.667,
@@ -997,7 +1013,7 @@ return {
         {
           id = 59,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1559.33,
           y = 511.333,
@@ -1010,10 +1026,10 @@ return {
         {
           id = 60,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
-          x = 1561.67,
-          y = 31,
+          x = 1406.33,
+          y = 30.3333,
           width = 32,
           height = 64,
           rotation = 0,
@@ -1023,7 +1039,7 @@ return {
         {
           id = 61,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1386.67,
           y = 368.667,
@@ -1036,7 +1052,7 @@ return {
         {
           id = 62,
           name = "",
-          class = "",
+          type = "",
           shape = "rectangle",
           x = 1483.33,
           y = 190.667,
@@ -1045,6 +1061,37 @@ return {
           rotation = 0,
           visible = true,
           properties = {}
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      draworder = "topdown",
+      id = 27,
+      name = "Ship",
+      class = "",
+      visible = false,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      parallaxx = 1,
+      parallaxy = 1,
+      properties = {},
+      objects = {
+        {
+          id = 78,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 1489.33,
+          y = 32.6667,
+          width = 109.333,
+          height = 62,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["collidable"] = true
+          }
         }
       }
     }
