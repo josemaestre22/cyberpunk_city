@@ -9,8 +9,13 @@ function ship:load()
     self.scale_x = self.width / self.image:getWidth()
     self.scale_y = self.height / self.image:getHeight() 
     self.name = "Ship"
+    world:add(self, self.x, self.y, self.width, self.height)
 end
 
 function ship:draw()
-    love.graphics.draw(self.image, self.x, self.y, 0, self.scale_x, self.scale_y)
+    if won then
+        love.graphics.draw(self.image, 350, 325, 0, self.scale_x, self.scale_y)
+    else
+        love.graphics.draw(self.image, self.x, self.y, 0, self.scale_x, self.scale_y)
+    end
 end

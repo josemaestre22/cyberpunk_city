@@ -44,7 +44,7 @@ function love.load()
 end
 
 function love.update(dt)
-	if player.dead then
+	if player.dead or won then
 		music:stop()
 		if love.keyboard.isDown("space") then
 			love.load()
@@ -64,7 +64,9 @@ function love.draw()
 		love.graphics.print("You died!", love.graphics.newFont("assets/GravityBold8.ttf"), 350, 300)
 		love.graphics.print("Press Space to try again", love.graphics.newFont("assets/GravityBold8.ttf"), 275, 400)
 	elseif won then
-		love.graphics.print("You Won!", love.graphics.newFont("assets/GravityBold8.ttf"), 350, 300)
+		love.graphics.print("You've escaped!", love.graphics.newFont("assets/GravityBold8.ttf"), 325, 300)
+		love.graphics.print("Press Space to play again", love.graphics.newFont("assets/GravityBold8.ttf"), 275, 400)
+		ship:draw()
 	else
 		-- Draw everything inside the camera
 		camera:draw(draw_calls)
@@ -86,5 +88,4 @@ function draw_calls()
 	enemies:draw()
 	bullets:draw()
 	ship:draw()
-	-- map:bump_draw()
 end
