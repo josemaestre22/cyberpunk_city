@@ -21,6 +21,9 @@ function love.load()
 	
 	-- Set scaling filter to prevent blurrines 
 	love.graphics.setDefaultFilter("nearest", "nearest")
+
+	-- Set window Title
+	love.window.setTitle("Cyberpunk City")
 	
 	-- Load map file and collidable world
 	map = sti("tiled_map/Sidescroller city map extended.lua", {"bump"})
@@ -32,6 +35,7 @@ function love.load()
 	
 	--Load music
 	music = love.audio.newSource("assets/DavidKBD - Pink Bloom Pack - 09 - Lightyear City.ogg", "stream") -- the "stream" tells LÖVE to stream the file from disk, good for longer music tracks
+	music:setLooping(true)
 	music:play()
 	
 	-- Load player
